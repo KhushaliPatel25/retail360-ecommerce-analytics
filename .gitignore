@@ -1,0 +1,38 @@
+# Local environments and caches
+.venv/
+venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ipynb_checkpoints/
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Secrets and personal settings
+.env
+.env.*
+!.env.example
+*.key
+*.pem
+*.pfx
+*.p12
+
+# Raw and generated row-level data; Power BI models
+/data/
+*.db
+*.db-shm
+*.db-wal
+*.sqlite
+*.sqlite3
+*.pbix
+*.pbit
+*.pbip
+
+# Temporary files and archives
+*.log
+*.bak
+*.tmp
+*.zip
