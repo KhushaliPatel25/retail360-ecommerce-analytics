@@ -1,70 +1,118 @@
-# Retail360 — E-Commerce Analytics
+# Retail360 — E-Commerce Sales & Operations Analytics
 
-**Python · SQL (SQLite) · Power BI** | Historical Brazilian e-commerce transactions (Olist)
+**Python · SQL / SQLite · Power BI**  
+**Data:** Brazilian E-Commerce Public Dataset by Olist (historical transactions, 2016–2018)
 
-Retail360 examines merchandise performance, purchasing behaviour, geographic demand, delivery reliability and customer reviews. The analysis combines source-table validation, SQL reporting views, Python aggregations and an interactive Power BI executive report.
+Retail360 investigates how product demand, regional purchasing patterns, delivery performance, and customer experience relate to e-commerce operations. The analysis combines Python-based data validation, relational SQL reporting, and an interactive Power BI executive dashboard.
 
 ![Retail360 executive dashboard](assets/dashboard_overview.png)
 
-## Executive dashboard
+## Executive overview
 
-The dashboard's selected reporting period is **February 2017–July 2018**, with all customer states included.
+The dashboard supports filtering by **customer state** and **purchase month**. The figures below reflect **all states, February 2017–July 2018**.
 
-| KPI | Value | Definition |
-| --- | ---: | --- |
-| Delivered merchandise value | **R$12.23M** | Item prices for eligible delivered orders; excludes freight |
-| Delivered orders | **89,110** | Distinct delivered orders with item records |
-| Average order value | **R$137.25** | Delivered merchandise value ÷ eligible delivered orders |
-| On-time delivery | **93.14%** | Share delivered on or before estimated date among orders with usable delivery dates |
+| Metric | Result | Calculation scope |
+|:--|--:|:--|
+| Delivered merchandise value | **R$12.23M** | Sum of item prices for eligible delivered orders; excludes freight |
+| Delivered orders | **89,110** | Distinct delivered orders with matching item records |
+| Average order value | **R$137.25** | R$12,230,652.13 / 89,110 delivered orders |
+| On-time delivery rate | **93.14%** | 82,986 of 89,102 delivered orders with usable delivery dates and nonnegative durations |
 
-The first three KPIs reconcile with the SQL order-summary view: **R$12,230,652.13** over **89,110** distinct eligible orders. The on-time delivery rate (**82,986 / 89,102 = 93.14%**) is calculated from delivered orders with valid delivery timestamps and nonnegative delivery durations. This analysis uses different eligibility criteria from the delivered-order KPI, which requires matching item records; therefore, the denominators are not directly interchangeable.
+The merchandise value, delivered-order count, and average order value were reconciled against the SQL order-summary view. The delivery-rate denominator follows different eligibility rules and should not be equated with the order-count KPI.
 
-## Findings
+## Key findings
 
-- **Category concentration.** Across all delivered orders in the category analysis, the ten highest-value product categories accounted for **62.43%** (**R$8.25M of R$13.22M**) of merchandise value. This analysis covers a broader period than the dashboard's selected reporting window.
-- **Low repeat-purchase incidence.** Of **93,358** unique customers in the customer-frequency analysis, **2,801 (3.0%)** placed repeat orders. This is a descriptive historical measure, not an estimated retention rate for a future cohort.
-- **Delivery and reviews.** Orders classified as late averaged **2.23/5** in review score, compared with **4.28/5** for on-time orders in the reviewed-order sample. The relationship is observational, not proof of causality.
-- **Geographic variation.** São Paulo leads state-level merchandise value. State and purchase-month slicers allow the dashboard to separate overall performance from local demand patterns.
+- **Concentrated category demand:** The ten highest-value product categories contributed **62.43%** of delivered merchandise value (**R$8.25M of R$13.22M**) in the full-period category analysis. This period is broader than the executive dashboard selection.
+- **Geographic concentration:** **São Paulo** accounted for approximately **R$5.07M (38.33%)** of merchandise value in the full-period state analysis, making it the largest customer-state market by value.
+- **Limited repeat purchasing:** **2,801 of 93,358** distinct customers (**3.00%**) placed at least two delivered orders in the customer-frequency analysis. This is not a cohort retention rate.
+- **Delivery and customer satisfaction:** Late deliveries averaged **2.23/5** in customer review scores, compared with **4.28/5** for on-time deliveries. Low ratings (1–2 stars) represented **63.65%** of late-delivery reviews versus **9.37%** for on-time reviews. These are observational associations, not causal estimates.
 
-These findings come from analyses with potentially different eligibility and reporting windows; figures are not combined into a single population unless explicitly stated.
+The supporting analyses use clearly defined, sometimes different reporting populations. Figures should only be compared directly when the filters and denominators align.
 
-## Data model and methodology
+## Analytical workflow
 
-![Power BI order-summary and order-item relationship](assets/data_model_relationship.png)
+**Nine Olist CSV tables → Python validation and transformations → SQLite tables and reporting views → Power BI model and dashboard**
 
-1. **Audit source data:** inspect record counts, missing fields, duplicate rows, primary keys and order/item relationships.
-2. **Build reporting tables:** load the nine Olist source CSVs into SQLite; create indexed tables and SQL views. `vw_order_summary` aggregates items and payments before joining to order headers, maintaining one row per order. `vw_item_sales` retains item-level detail.
-3. **Analyse:** calculate category contribution, monthly trends, order frequency, state-level demand, delivery punctuality and review patterns with Python and SQL.
-4. **Visualise:** feed the `OrderSummary` and `OrderItems` exports into Power BI with a **1-to-many** relationship on `order_id`. The report uses KPI cards, bar and line charts, and interactive state/date slicers.
+1. **Data quality:** Audited row counts, nulls, duplicates, key uniqueness, and unmatched order relationships.
+2. **SQL reporting layer:** Built indexed source tables, joins, CTEs, window-function analyses, and reporting views. `vw_order_summary` aggregates items and payments separately to prevent join multiplication and retains **one row per order**; `vw_item_sales` preserves item-level detail.
+3. **Analysis:** Used Python and SQL to investigate product categories, monthly trends, customer frequency, geographic sales, delivery reliability, and reviews.
+4. **Business intelligence:** Connected `OrderSummary` (one) to `OrderItems` (many) on `order_id` in Power BI, with KPI measures, comparative charts, and state/date slicers.
 
-**Selected implementation:** [Database ingestion](scripts/21_build_sql_database.py) · [Reporting views](sql/06_reporting_views.sql) · [Data-quality SQL](sql/05_data_quality.sql) · [Power BI export](scripts/24_export_powerbi_data.py)
+![Power BI order-to-item data model](assets/data_model_relationship.png)
 
-## Supporting visuals
+**Implementation:** [Database ingestion](scripts/21_build_sql_database.py) · [Reporting views](sql/06_reporting_views.sql) · [SQL data-quality checks](sql/05_data_quality.sql) · [Power BI dataset export](scripts/24_export_powerbi_data.py)
 
-| Product category performance | Delivery and customer reviews |
-| --- | --- |
-| ![Top product categories](assets/top_10_categories.png) | ![Customer satisfaction and delivery timing](assets/customer_satisfaction_dashboard.png) |
+## Analytical visuals
 
-Additional figures are available in [`assets/`](assets/) and summary outputs in [`reports/`](reports/).
+| Product category performance | Delivery timing and customer reviews |
+|:--:|:--:|
+| ![Top product categories by merchandise value](assets/top_10_categories.png) | ![Review ratings by delivery status](assets/customer_satisfaction_dashboard.png) |
 
-## Repository contents
+<details>
+<summary><strong>Explore the remaining five analytical charts</strong></summary>
+
+### Monthly merchandise value
+
+![Monthly delivered merchandise value](assets/monthly_sales_trend.png)
+
+### Month-over-month growth
+
+![Monthly merchandise value growth](assets/monthly_growth_chart.png)
+
+### Geographic merchandise value
+
+![Top customer states by merchandise value](assets/top_10_states_sales.png)
+
+### Customer purchase frequency
+
+![Customer purchase segmentation](assets/customer_segmentation_chart.png)
+
+### Regional delivery performance
+
+![Delivery performance by state](assets/delivery_performance_by_state.png)
+
+</details>
+
+## Data outputs
+
+Ten aggregate reports are retained in [`reports/`](reports/), organized by analytical subject.
+
+| Area | Reports |
+|:--|:--|
+| Source validation | [`dataset_audit_summary.csv`](reports/dataset_audit_summary.csv) |
+| Product performance | [`all_category_performance.csv`](reports/all_category_performance.csv), [`top_10_product_categories.csv`](reports/top_10_product_categories.csv) |
+| Sales and growth | [`monthly_sales_trends.csv`](reports/monthly_sales_trends.csv), [`monthly_growth_analysis.csv`](reports/monthly_growth_analysis.csv) |
+| Customer experience | [`customer_repeat_summary.csv`](reports/customer_repeat_summary.csv), [`customer_satisfaction_by_delivery.csv`](reports/customer_satisfaction_by_delivery.csv) |
+| Geography and delivery | [`geographic_sales_performance.csv`](reports/geographic_sales_performance.csv), [`delivery_performance_summary.csv`](reports/delivery_performance_summary.csv), [`delivery_performance_by_state.csv`](reports/delivery_performance_by_state.csv) |
+
+## Repository structure
 
 ```text
-assets/          Power BI captures and generated Python visualisations
-scripts/         Data audits, transformations, analysis and chart generation
-sql/             Aggregations, joins, CTEs, window functions, quality checks, reporting views
-reports/         Selected aggregate CSV outputs
-requirements.txt Python dependencies
+retail360-ecommerce-analytics/
+├── assets/             9 dashboard, model, and analytical PNGs
+├── reports/            10 aggregated CSV reports
+├── scripts/            24 Python scripts for audits, analysis, and reporting
+├── sql/                6 SQL files covering analytics, validation, and views
+├── requirements.txt
+└── README.md
 ```
 
 ## Reproducing the analysis
 
-Source data are not stored in this repository. Obtain the nine original CSV files from the [Olist dataset on Kaggle](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), and place them in `data/raw/` with their original filenames. Install the packages in `requirements.txt` in a Python 3.12 environment.
+The original row-level data and Power BI `.pbix` are not distributed in this repository. Download the **nine original CSVs** from the [Olist dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce) and place them, with unchanged filenames, under `data/raw/`. Use Python 3.12 with the dependencies in `requirements.txt`.
 
-Execute the Python scripts in numerical order from the repository root. `scripts/21_build_sql_database.py` creates the SQLite database, `scripts/23_build_reporting_views.py` creates the reporting views, and `scripts/24_export_powerbi_data.py` writes `data/powerbi/OrderSummary.csv` and `OrderItems.csv`. The SQL quality-check runner uses `sql/05_data_quality.sql`. The original Power BI `.pbix` is not distributed because it contains an imported data model; the report and model are documented through screenshots above.
+Execute the numbered analysis scripts in [`scripts/`](scripts/) in order to regenerate the analytical reports and charts. The database and reporting layer can be rebuilt using these entry points:
 
-**Limitations:** Historical, anonymised marketplace data; merchandise value is not accounting revenue or profit. Some source records lack matched order items or complete delivery timestamps. Category- and order-level summaries have different counting units, and some analyses use different date ranges.
+```bash
+python scripts/21_build_sql_database.py
+python scripts/23_build_reporting_views.py
+python scripts/24_export_powerbi_data.py
+```
 
-## Data source and attribution
+The final step writes the Power BI input tables to `data/powerbi/`. The executive dashboard and data-model screenshots document the locally developed Power BI report; its `.pbix` is withheld because the imported model contains row-level records.
 
-[Olist — Brazilian E-Commerce Public Dataset (Kaggle)](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce), licensed **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**. Olist retains the rights to its source dataset; analyses and derived artifacts are presented for non-commercial use under the applicable source terms.
+**Interpretation limits:** This is historical marketplace analysis, not a live operational feed. Merchandise value is not recognized accounting revenue or profit. Some orders lack item matches or complete delivery timestamps, and category-, order-, and review-level analyses have different units of observation.
+
+## Data source & attribution
+
+**Olist — [Brazilian E-Commerce Public Dataset](https://www.kaggle.com/datasets/olistbr/brazilian-ecommerce)**. The source is distributed under **[CC BY-NC-SA 4.0](https://creativecommons.org/licenses/by-nc-sa/4.0/)**; attribution, non-commercial, and share-alike conditions apply to relevant derived materials.
