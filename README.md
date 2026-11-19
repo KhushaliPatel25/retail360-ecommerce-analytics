@@ -17,11 +17,11 @@ The dashboard's selected reporting period is **February 2017–July 2018**, with
 | Average order value | **R$137.25** | Delivered merchandise value ÷ eligible delivered orders |
 | On-time delivery | **93.14%** | Share delivered on or before estimated date among orders with usable delivery dates |
 
-The first three KPIs reconcile with the SQL order-summary view: **R$12,230,652.13** over **89,110** distinct eligible orders. The on-time result is also reported by the delivery analysis (**82,986 / 89,102 = 93.14%**); its denominator excludes delivered orders without complete dates and therefore differs from the order-count KPI.
+The first three KPIs reconcile with the SQL order-summary view: **R$12,230,652.13** over **89,110** distinct eligible orders. The on-time delivery rate (**82,986 / 89,102 = 93.14%**) is calculated from delivered orders with valid delivery timestamps and nonnegative delivery durations. This analysis uses different eligibility criteria from the delivered-order KPI, which requires matching item records; therefore, the denominators are not directly interchangeable.
 
 ## Findings
 
-- **Category concentration.** The ten highest-value categories represent **62.43%** of merchandise value in the category analysis. Category mix matters when interpreting the headline total.
+- **Category concentration.** Across all delivered orders in the category analysis, the ten highest-value product categories accounted for **62.43%** (**R$8.25M of R$13.22M**) of merchandise value. This analysis covers a broader period than the dashboard's selected reporting window.
 - **Low repeat-purchase incidence.** Of **93,358** unique customers in the customer-frequency analysis, **2,801 (3.0%)** placed repeat orders. This is a descriptive historical measure, not an estimated retention rate for a future cohort.
 - **Delivery and reviews.** Orders classified as late averaged **2.23/5** in review score, compared with **4.28/5** for on-time orders in the reviewed-order sample. The relationship is observational, not proof of causality.
 - **Geographic variation.** São Paulo leads state-level merchandise value. State and purchase-month slicers allow the dashboard to separate overall performance from local demand patterns.
